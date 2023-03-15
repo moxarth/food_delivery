@@ -2,9 +2,11 @@ import 'package:email_validator/email_validator.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:front_end/screens/home_page.dart';
 import 'package:front_end/screens/register_page.dart';
 import 'package:front_end/widgets/custom_input.dart';
 
+import '../api.dart';
 import '../widgets/custom_buttom.dart';
 
 class LoginPage extends StatefulWidget {
@@ -131,11 +133,23 @@ class _LoginPageState extends State<LoginPage> {
                             isLoading = true;
                           });
                           if (_formKey.currentState!.validate()) {
-                            Fluttertoast.showToast(msg: "SUCCESS");
-                            Navigator.pushReplacementNamed(context, RegisterPage.routeName);
-                            setState(() {
-                              isLoading = false;
-                            });
+                            Map<String, dynamic> form_Data = {
+                              'email': email,
+                              'password': password,
+                            };
+                            var response = await Postdata(
+                                Uri.http('localhost:5000', 'login'), form_Data);
+                            if (response['status'] == 200) {
+                              Fluttertoast.showToast(msg: response['message']);
+                              // ignore: use_build_context_synchronously
+                              Navigator.pushReplacementNamed(
+                                  context, HomePage.routeName);
+                              setState(() {
+                                isLoading = false;
+                              });
+                            } else {
+                              Fluttertoast.showToast(msg: response['message']);
+                            }
                           } else {
                             Fluttertoast.showToast(msg: "ERROR OCCURRED");
                             setState(() {
@@ -145,6 +159,32 @@ class _LoginPageState extends State<LoginPage> {
                         },
                         text: "Login",
                         isLoading: isLoading,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "Don't have any account? ",
+                            style: TextStyle(
+                              fontSize: 18.0,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 8.0,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, RegisterPage.routeName);
+                            },
+                            child: Text(
+                              "Create New",
+                              style: TextStyle(
+                                fontSize: 18.0,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

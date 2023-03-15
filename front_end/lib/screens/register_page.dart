@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:front_end/widgets/custom_input.dart';
 
+import '../api.dart';
 import '../widgets/custom_buttom.dart';
+import 'home_page.dart';
 import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -184,9 +186,23 @@ class _BodyState extends State<Body> {
                             isLoading = true;
                           });
                           if (_formKey.currentState!.validate()) {
-                            setState(() {
-                              isLoading = false;
-                            });
+                            Map<String, dynamic> form_Data = {
+                              'email': email,
+                              'password': password,
+                            };
+                            var response = await Postdata(
+                                Uri.http('localhost:5000', 'register'), form_Data);
+                            if (response['status'] == 200) {
+                              Fluttertoast.showToast(msg: response['message']);
+                              // ignore: use_build_context_synchronously
+                              Navigator.pushReplacementNamed(
+                                  context, HomePage.routeName);
+                              setState(() {
+                                isLoading = false;
+                              });
+                            } else {
+                              Fluttertoast.showToast(msg: response['message']);
+                            }
                           } else {
                             Fluttertoast.showToast(msg: "ERROR OCCURRED");
                             setState(() {

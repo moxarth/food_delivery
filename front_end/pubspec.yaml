@@ -41,6 +41,7 @@ dependencies:
   email_validator: ^2.1.17
   fluttertoast: ^8.2.1
   carousel_slider: ^4.2.1
+  http:
 
 dev_dependencies:
   flutter_test:
