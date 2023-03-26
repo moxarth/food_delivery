@@ -1,7 +1,7 @@
 # Food Delivery Mobile Web Application
 
 ## Pre-requisites
-1. Install flutter [sdk](https://docs.flutter.dev/get-started/install)
+1. Install flutter [sdk](https://docs.flutter.dev/get-started/install) and Set an Environment variable
     - `Note`: Make sure that flutter is setup thoroughly using `flutter doctor` command.
 2. Install python dependencies using below command
     - Go to \flask_test
