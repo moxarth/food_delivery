@@ -1,6 +1,7 @@
 from flask import Flask,request,jsonify
 from flask_sqlalchemy import SQLAlchemy
 import yaml
+from random_rests import menu, get_random_rests
 
 # with open("../config.yml", 'r') as stream:
 #     try:
@@ -18,13 +19,7 @@ app = Flask(__name__)
 
 @app.route("/rests",methods=["GET", "POST"])
 def get_restros():
-    all_res = []
-    for i in range(1, 21):
-        doc = {
-            'name': f'rest-{i}',
-            'image': 'https://images.hindustantimes.com/rf/image_size_960x540/HT/p2/2018/12/15/Pictures/_9f2b6346-ffd3-11e8-9457-b1b429387a4e.jpg',
-        }
-        all_res.append(doc)
+    all_res = get_random_rests()
     return all_res
 
 

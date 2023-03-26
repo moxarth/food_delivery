@@ -40,7 +40,7 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   _getMenu(Map<String, dynamic> query) async {
-    await Getdata(Uri.http('localhost:5001', 'menu', query)).then((value) {
+    await Getdata(Uri.http('localhost:5000', 'menu', query)).then((value) {
       setState(() {
         if (query['restaurant'] != '') {
           menu = value[query['restaurant']];

@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
 
   _setRestaurants() async {
     await Getdata(Uri.http(
-      'localhost:5001',
+      'localhost:5000',
       'rests',
     )).then(
       (value) {

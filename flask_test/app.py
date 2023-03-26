@@ -6,6 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from werkzeug.security import generate_password_hash, check_password_hash
 import yaml
 import json
+from random_rests import get_random_rests, menu
 
 # create Flask app
 app = Flask(__name__)
@@ -141,23 +142,11 @@ def register():
         return jsonify({'success': True, 'message': 'Successfully created a new account', 'status': 200})
 
 
-@app.route('/restaurant', methods=['GET', 'POST'])
+@app.route('/rests', methods=['GET', 'POST'])
 def restaurants():
     if request.method == 'GET':
-        # table = Table('restaurant', metadata)
-        # query = select([table])
-        # result = session.execute(query)
-        # # query = select()
-        rows = session.query(Restaurant).all()
-        result = [row.to_dict() for row in rows]
-        print(result)
-        with engine.connect() as con:
-            results = con.execute(text('SELECT * FROM restaurant;'))
-            print(results)
-            rows = [r.as_dict() for r in results]
-            json_result = json.dumps(rows)
-        # print(result)
-        return jsonify({'success': True, 'data': json_result})
+        all_res = get_random_rests()
+        return all_res
     elif request.method == 'POST':
         args = request.form
         rests  = Restaurant(name=args['name'], image_url=args['image_url'], rating=args['rating'])
@@ -166,20 +155,52 @@ def restaurants():
         return jsonify({'success': True, 'message': f'Successfully created a restaurant: {args["name"]}'})
 
 
+# @app.route("/rests",methods=["GET", "POST"])
+# def get_restros():
+#     all_res = get_random_rests()
+#     return all_res
+
+
 @app.route('/menu', methods=['GET', 'POST'])
 def menus():
-    args = request.form
-    restaurant = args['restaurant']
+    # args = request.form
+    # restaurant = args['restaurant']
     if request.method == 'GET':
-        table = Table('menu', metadata)
-        select_stmt = select([table]).where(table.c.restaurant == restaurant)
-        result = session.execute(select_stmt)
-        return jsonify({'success': True, 'data': result})
+        all_menu = []
+        args = request.args
+        restaurant = args.get('restaurant', 'blueberry')
+        if restaurant == "":
+            restaurant = 'blueberry'
+        for i in range(1, 21):
+            doc = {
+                'menu_name': f'{restaurant}-menu-{i}',
+                'menu_image': 'https://b.zmtcdn.com/data/pictures/chains/5/3000095/b5200d2866c85d4d734f59a6f60b2ae1.jpg',
+                'price': 450,
+            }
+            all_menu.append(doc)
+        return {restaurant: all_menu}
     elif request.method == 'POST':
         rests  = Menu(name=args['name'], image_url=args['image_url'], rating=args['rating'], restaurant=args['restaurant'])
         session.add(rests)
         session.commit()
         return jsonify({'success': True, 'message': f'Successfully created a menu for restaurant: {args["restaurant"]}'})
+
+
+# @app.route("/menu",methods=["GET"])
+# def get_menu():
+#     all_menu = []
+#     args = request.args
+#     restaurant = args.get('restaurant', 'blueberry')
+#     if restaurant == "":
+#         restaurant = 'blueberry'
+#     for i in range(1, 21):
+#         doc = {
+#             'menu_name': f'{restaurant}-menu-{i}',
+#             'menu_image': 'https://b.zmtcdn.com/data/pictures/chains/5/3000095/b5200d2866c85d4d734f59a6f60b2ae1.jpg',
+#             'price': 450,
+#         }
+#         all_menu.append(doc)
+#     return {restaurant: all_menu}
 
 
 @app.route('/payment', methods=['GET', 'POST'])
