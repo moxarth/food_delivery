@@ -4,3 +4,4 @@ flask_marshmallow
 pyyaml
 pymysql
 flask_httpauth
+cryptography

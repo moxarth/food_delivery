@@ -12,12 +12,15 @@ Future Getdata(url) async {
 }
 
 Future Postdata(url, form) async {
-  var headers = {
-    'Accept': 'application/json, text/plain, */*',
-    'Content-Type': 'application/x-www-form-urlencoded'
-  };
   try {
-    http.Response response = await http.post(url, body: form, headers: headers);
+    http.Response response = await http.post(
+      url,
+      body: form,
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+    );
     return json.decode(response.body);
   } catch (error) {
     rethrow; // re-throw the same error to the caller

@@ -1,10 +1,11 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 from flask_httpauth import HTTPBasicAuth
-from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import create_engine, Column, Integer, String, JSON, Table, select, MetaData, text, Text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from werkzeug.security import generate_password_hash, check_password_hash
 import yaml
+import json
 
 # create Flask app
 app = Flask(__name__)
@@ -33,6 +34,7 @@ session = Session()
 
 # create SQLAlchemy base
 Base = declarative_base()
+metadata = MetaData()
 
 # create User model
 class User(Base):
@@ -52,14 +54,41 @@ class User(Base):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+
+class Restaurant(Base):
+    __tablename__ = 'restaurant'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=False)
+    image_url = Column(String(256), nullable=False)
+    rating = Column(Integer, nullable=True)
+
+
+class Menu(Base):
+    __tablename__ = 'menu'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), nullable=True)
+    image_url = Column(String(256), nullable=True)
+    restaurant = Column(String(200), nullable=True)
+    rating = Column(Integer, nullable=True)
+
+
+class Order(Base):
+    __tablename__ = 'order'
+    id = Column(Integer, primary_key=True)
+    price = Column(Integer, nullable=True)
+    order = Column(JSON, nullable=True)
+
+
+class Payment(Base):
+    __tablename__ = 'payment'
+    id = Column(Integer, primary_key=True)
+    amount = Column(Integer, nullable=True)
+    order = Column(String(200), nullable=True)
+
+
 # create users table
 Base.metadata.create_all(engine)
 
-# create sample user
-# user = User(email='admin')
-# user.set_password('password')
-# session.add(user)
-# session.commit()
 
 # verify email and password
 @auth.verify_password
@@ -78,18 +107,10 @@ def login():
             session.add(user)
             session.commit()
             return jsonify({'status': 200, 'message': 'success'})
-            # return redirect(url_for('home'))
         else:
             error_msg = 'Invalid email or password'
             return jsonify({'status': 401, 'message': error_msg})
-            # return render_template('login.html', error_msg=error_msg)
-    # else:
-    #     return render_template('login.html')
 
-# @app.route('/')
-# @auth.login_required
-# def home():
-#     return 'Hello, World!'
     
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -118,6 +139,95 @@ def register():
         session.add(user)
         session.commit()
         return jsonify({'success': True, 'message': 'Successfully created a new account', 'status': 200})
+
+
+@app.route('/restaurant', methods=['GET', 'POST'])
+def restaurants():
+    if request.method == 'GET':
+        # table = Table('restaurant', metadata)
+        # query = select([table])
+        # result = session.execute(query)
+        # # query = select()
+        rows = session.query(Restaurant).all()
+        result = [row.to_dict() for row in rows]
+        print(result)
+        with engine.connect() as con:
+            results = con.execute(text('SELECT * FROM restaurant;'))
+            print(results)
+            rows = [r.as_dict() for r in results]
+            json_result = json.dumps(rows)
+        # print(result)
+        return jsonify({'success': True, 'data': json_result})
+    elif request.method == 'POST':
+        args = request.form
+        rests  = Restaurant(name=args['name'], image_url=args['image_url'], rating=args['rating'])
+        session.add(rests)
+        session.commit()
+        return jsonify({'success': True, 'message': f'Successfully created a restaurant: {args["name"]}'})
+
+
+@app.route('/menu', methods=['GET', 'POST'])
+def menus():
+    args = request.form
+    restaurant = args['restaurant']
+    if request.method == 'GET':
+        table = Table('menu', metadata)
+        select_stmt = select([table]).where(table.c.restaurant == restaurant)
+        result = session.execute(select_stmt)
+        return jsonify({'success': True, 'data': result})
+    elif request.method == 'POST':
+        rests  = Menu(name=args['name'], image_url=args['image_url'], rating=args['rating'], restaurant=args['restaurant'])
+        session.add(rests)
+        session.commit()
+        return jsonify({'success': True, 'message': f'Successfully created a menu for restaurant: {args["restaurant"]}'})
+
+
+@app.route('/payment', methods=['GET', 'POST'])
+def payment():
+    if request.method == 'GET':
+        table = Table('payment', metadata)
+        select_stmt = select([table])
+        result = session.execute(select_stmt)
+        return jsonify({'success': True, 'data': result})
+    elif request.method == 'POST':
+        args = request.form
+        amount = args['amount']
+        order = args['order']
+        rests  = Payment(amount=amount, order=order)
+        session.add(rests)
+        session.commit()
+        return jsonify({'success': True, 'message': f'Successfully created a payment for order: {order}'})
+
+
+# -----------------------------------------------------------------------
+@app.route("/rests",methods=["GET", "POST"])
+def get_restros():
+    all_res = []
+    for i in range(1, 21):
+        doc = {
+            'name': f'rest-{i}',
+            'image': 'https://images.hindustantimes.com/rf/image_size_960x540/HT/p2/2018/12/15/Pictures/_9f2b6346-ffd3-11e8-9457-b1b429387a4e.jpg',
+        }
+        all_res.append(doc)
+    return all_res
+
+
+@app.route("/menu",methods=["GET", "POST"])
+def get_menu():
+    all_menu = []
+    args = request.args
+    restaurant = args.get('restaurant', 'blueberry')
+    if restaurant == "":
+        restaurant = 'blueberry'
+    for i in range(1, 21):
+        doc = {
+            'menu_name': f'{restaurant}-menu-{i}',
+            'menu_image': 'https://b.zmtcdn.com/data/pictures/chains/5/3000095/b5200d2866c85d4d734f59a6f60b2ae1.jpg',
+            'price': 450,
+        }
+        all_menu.append(doc)
+    return {restaurant: all_menu}
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

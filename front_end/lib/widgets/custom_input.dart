@@ -40,28 +40,28 @@ class _CustomInputState extends State<CustomInput> {
       onChanged: widget.onChanged,
       decoration: InputDecoration(
         suffixIcon: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: widget.iconData,
         ),
         floatingLabelBehavior: FloatingLabelBehavior.always,
         hintText: widget.hintText,
         labelText: widget.label,
-        labelStyle: TextStyle(
+        labelStyle: const TextStyle(
           color: Colors.black,
           fontSize: 22.0,
         ),
-        contentPadding: EdgeInsets.symmetric(
+        contentPadding: const EdgeInsets.symmetric(
             vertical: 20.0,
-            horizontal: 75.0),
+            horizontal: 40.0),
         border: OutlineInputBorder(
-          gapPadding: 3.0,
+          gapPadding: 5.0,
           borderRadius: BorderRadius.circular(20.0),
-          borderSide: BorderSide(width: 2.0, color: Colors.orange),
+          borderSide: const BorderSide(width: 2.0, color: Colors.orange),
         ),
         focusedBorder: OutlineInputBorder(
-          gapPadding: 3.0,
+          gapPadding: 5.0,
           borderRadius: BorderRadius.circular(20.0),
-          borderSide: BorderSide(width: 2.0, color: Colors.orange),
+          borderSide: const BorderSide(width: 2.0, color: Colors.orange),
         ),
       ),
     );
