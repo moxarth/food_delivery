@@ -115,7 +115,7 @@ class _HomePageState extends State<HomePage> {
                   'rating': "0"
                 };
                 var response = await Postdata(
-                    Uri.http('localhost:5000', 'restaurant'), data);
+                    Uri.http('localhost:5000', 'rests'), data);
                 if (response['success'] == true) {
                   Fluttertoast.showToast(msg: 'Added a restaurant $restName');
                   Navigator.of(context).pop();

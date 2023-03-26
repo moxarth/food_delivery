@@ -171,14 +171,14 @@ def menus():
         restaurant = args.get('restaurant', 'blueberry')
         if restaurant == "":
             restaurant = 'blueberry'
-        for i in range(1, 21):
-            doc = {
-                'menu_name': f'{restaurant}-menu-{i}',
-                'menu_image': 'https://b.zmtcdn.com/data/pictures/chains/5/3000095/b5200d2866c85d4d734f59a6f60b2ae1.jpg',
-                'price': 450,
-            }
-            all_menu.append(doc)
-        return {restaurant: all_menu}
+        # for i in range(1, 21):
+        #     doc = {
+        #         'menu_name': f'{restaurant}-menu-{i}',
+        #         'menu_image': 'https://b.zmtcdn.com/data/pictures/chains/5/3000095/b5200d2866c85d4d734f59a6f60b2ae1.jpg',
+        #         'price': 450,
+        #     }
+        #     all_menu.append(doc)
+        return {restaurant: menu}
     elif request.method == 'POST':
         rests  = Menu(name=args['name'], image_url=args['image_url'], rating=args['rating'], restaurant=args['restaurant'])
         session.add(rests)
