@@ -45,7 +45,7 @@ class _MenuPageState extends State<MenuPage> {
         if (query['restaurant'] != '') {
           menu = value[query['restaurant']];
         } else {
-          menu = value['blueberry'];
+          menu = value['Pizza Hut'];
         }
       });
     });
@@ -53,8 +53,13 @@ class _MenuPageState extends State<MenuPage> {
 
   @override
   void initState() {
-    Map<String, dynamic> query = {'restaurant': widget.restaurantName};
-    _getMenu(query);
+    if (widget.restaurantName == '') {
+      Map<String, dynamic> query = {'restaurant': 'Pizza Hut'};
+      _getMenu(query);
+    } else {
+      Map<String, dynamic> query = {'restaurant': widget.restaurantName};
+      _getMenu(query);
+    }
     super.initState();
   }
 
@@ -97,7 +102,17 @@ class _MenuPageState extends State<MenuPage> {
               ),
             ),
             GestureDetector(
-              onTap: () {
+              onTap: () async {
+                for (var value in menu_data.values) {
+                  var data = {
+                    'name': value['menu_name'],
+                    'image_url': value['menu_image'],
+                    'price': value['price'].toString(),
+                    'quantity': value['count'].toString()
+                  };
+                  await Postdata(Uri.http('localhost:5000', 'order'), data);
+                }
+
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) {

@@ -49,6 +49,7 @@ class _OrderPageState extends State<OrderPage> {
                   'order': Uuid().v1().toString(),
                   'amount': total.toString(),
                 };
+                await Deletedata(Uri.http('localhost:5000', 'order'));
                 var response =
                     await Postdata(Uri.http('localhost:5000', 'payment'), data);
                 if (response['success'] == true) {
@@ -64,6 +65,42 @@ class _OrderPageState extends State<OrderPage> {
         );
       },
     );
+  }
+
+  List? orders = [
+    {
+      "name": "Vegan Mushroom Stroganoff",
+      "image_url":
+          "https://c.ndtvimg.com/2020-09/if4pp5j8_vegetarian_625x300_30_September_20.jpg",
+      "price": 450,
+      "quantity": 1
+    }
+  ];
+
+  _get_data() async {
+    await Getdata(Uri.http('localhost:5000', 'order')).then((value) {
+      setState(() {
+        orders = value;
+      });
+    }).onError((error, stackTrace) {
+      setState(() {
+        orders = [
+          {
+            "name": "Vegan Mushroom Stroganoff",
+            "image_url":
+                "https://c.ndtvimg.com/2020-09/if4pp5j8_vegetarian_625x300_30_September_20.jpg",
+            "price": 450,
+            "quantity": 1
+          }
+        ];
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    _get_data();
+    super.initState();
   }
 
   @override
@@ -82,24 +119,25 @@ class _OrderPageState extends State<OrderPage> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: ListView(
-                  children: widget.order_data.keys.map(
-                    (key) {
-                      var quantity = widget.order_data[key]['count'];
-                      int price = widget.order_data[key]['price'];
-                      total += price;
-                      // return Text(widget.order_data[key].toString());
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ListTile(
-                          title: Text(key),
-                          trailing: Text('Rs. ${price.toString()} ($quantity)'),
-                          leading: Image.network(
-                              widget.order_data[key]['menu_image']),
+                child: ListView.builder(
+                  itemCount: orders!.length,
+                  itemBuilder: ((context, index) {
+                    return Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: ListTile(
+                        title: Text(orders![index]['name']),
+                        trailing: Text(
+                          'Rs. ${orders![index]["price"].toString()} (${orders![index]["quantity"]})',
                         ),
-                      );
-                    },
-                  ).toList(),
+                        leading: Image.network(
+                          orders![index]["image_url"],
+                          fit: BoxFit.cover,
+                          height: 50.0,
+                          width: 70.0,
+                        ),
+                      ),
+                    );
+                  }),
                 ),
               ),
               Align(

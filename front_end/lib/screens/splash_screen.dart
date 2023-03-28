@@ -15,12 +15,10 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
-  late AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this);
     Timer(const Duration(milliseconds: 3000), () {
       Navigator.popAndPushNamed(context, LoginPage.routeName);
       // Navigator.pop(context);
