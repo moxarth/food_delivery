@@ -113,11 +113,16 @@ class _MenuPageState extends State<MenuPage> {
                   await Postdata(Uri.http('localhost:5000', 'order'), data);
                 }
 
+                var data = menu_data;
+                setState(() {
+                  menu_data = {};
+                });
+
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) {
                       return OrderPage(
-                        order_data: menu_data,
+                        order_data: data,
                         title: "My Orders",
                       );
                     },

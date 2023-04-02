@@ -112,103 +112,96 @@ class _OrderPageState extends State<OrderPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Fluttertoast.showToast(msg: '');
-        Navigator.of(context).pop();
-        return await Getdata(Uri.http('localhost:5000', 'order'));
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-          backgroundColor: Colors.orange,
-        ),
-        body: Center(
-          child: Container(
-            margin: const EdgeInsets.symmetric(vertical: 10.0),
-            color: Colors.black12,
-            width: 500.0,
-            child: Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ListView.builder(
-                    itemCount: orders!.length,
-                    itemBuilder: ((context, index) {
-                      var quantity = orders![index]["quantity"];
-                      int price = orders![index]["price"];
-                      total += price;
-                      return Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: ListTile(
-                          title: Text(orders![index]['name']),
-                          trailing: Text(
-                            'Rs. ${orders![index]["price"].toString()} (${orders![index]["quantity"]})',
-                          ),
-                          leading: Image.network(
-                            orders![index]["image_url"],
-                            fit: BoxFit.cover,
-                            height: 50.0,
-                            width: 70.0,
-                          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+        backgroundColor: Colors.orange,
+      ),
+      body: Center(
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 10.0),
+          color: Colors.black12,
+          width: 500.0,
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListView.builder(
+                  itemCount: orders!.length,
+                  itemBuilder: ((context, index) {
+                    var quantity = orders![index]["quantity"];
+                    int price = orders![index]["price"];
+                    total += price;
+                    return Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: ListTile(
+                        title: Text(orders![index]['name']),
+                        trailing: Text(
+                          'Rs. ${orders![index]["price"].toString()} (${orders![index]["quantity"]})',
                         ),
-                      );
-                    }),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 12.0),
-                  child: Align(
-                    alignment: Alignment.bottomRight,
-                    child: GestureDetector(
-                      onTap: () => _dialogBuilder(context, total),
-                      child: Container(
-                        margin: const EdgeInsets.only(bottom: 10.0),
-                        decoration: BoxDecoration(
-                            color: Colors.blueGrey,
-                            borderRadius: BorderRadius.circular(8.0)),
-                        width: 200.0,
-                        height: 50.0,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: const [
-                            Icon(
-                              Icons.payment,
-                              color: Colors.white,
-                            ),
-                            Text(
-                              "Proceed to Pay",
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: 18.0),
-                            ),
-                          ],
+                        leading: Image.network(
+                          orders![index]["image_url"],
+                          fit: BoxFit.cover,
+                          height: 50.0,
+                          width: 70.0,
                         ),
                       ),
-                    ),
-                  ),
+                    );
+                  }),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 12.0),
-                  child: Align(
-                    alignment: Alignment.bottomLeft,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 12.0),
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: GestureDetector(
+                    onTap: () => _dialogBuilder(context, total),
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 10.0),
                       decoration: BoxDecoration(
                           color: Colors.blueGrey,
                           borderRadius: BorderRadius.circular(8.0)),
-                      width: 250.0,
+                      width: 200.0,
                       height: 50.0,
-                      child: Center(
-                        child: Text(
-                          "Total Amount: Rs. ${totalPrice.toString()}",
-                          style: TextStyle(color: Colors.white, fontSize: 18.0),
-                        ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: const [
+                          Icon(
+                            Icons.payment,
+                            color: Colors.white,
+                          ),
+                          Text(
+                            "Proceed to Pay",
+                            style: TextStyle(
+                                color: Colors.white, fontSize: 18.0),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 12.0),
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 10.0),
+                    decoration: BoxDecoration(
+                        color: Colors.blueGrey,
+                        borderRadius: BorderRadius.circular(8.0)),
+                    width: 250.0,
+                    height: 50.0,
+                    child: Center(
+                      child: Text(
+                        "Total Amount: Rs. ${totalPrice.toString()}",
+                        style: TextStyle(color: Colors.white, fontSize: 18.0),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
