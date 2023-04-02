@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:front_end/screens/add_restaurant.dart';
 import 'package:front_end/screens/home_page.dart';
 import 'package:front_end/screens/login_page.dart';
 import 'package:front_end/screens/menu_page.dart';
@@ -19,6 +20,7 @@ final Map<String, WidgetBuilder> routes = {
   RestaurantPage.routeName: (context) =>
       const RestaurantPage(title: "Restaurants"),
   TabPage.routeName: (context) => const TabPage(),
+  AddRestaurant.routeName: (context) => AddRestaurant(),
   OrderPage.routeName: (context) => OrderPage(
         title: "My Orders",
         order_data: {},

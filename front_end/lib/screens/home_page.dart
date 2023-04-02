@@ -7,6 +7,7 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:front_end/api.dart';
+import 'package:front_end/screens/add_restaurant.dart';
 import 'package:front_end/screens/menu_page.dart';
 import 'package:front_end/screens/restaurant_page.dart';
 import 'package:front_end/size_config.dart';
@@ -114,8 +115,8 @@ class _HomePageState extends State<HomePage> {
                   'image_url': imageUrl,
                   'rating': "0"
                 };
-                var response = await Postdata(
-                    Uri.http('localhost:5000', 'rests'), data);
+                var response =
+                    await Postdata(Uri.http('localhost:5000', 'rests'), data);
                 if (response['success'] == true) {
                   Fluttertoast.showToast(msg: 'Added a restaurant $restName');
                   Navigator.of(context).pop();
@@ -140,7 +141,8 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: GestureDetector(
         onTap: () {
-          _dialogBuilder(context);
+          // _dialogBuilder(context);
+          Navigator.pushNamed(context, AddRestaurant.routeName);
         },
         child: Container(
           color: Colors.blueGrey,
