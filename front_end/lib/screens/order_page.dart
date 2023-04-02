@@ -122,6 +122,9 @@ class _OrderPageState extends State<OrderPage> {
                 child: ListView.builder(
                   itemCount: orders!.length,
                   itemBuilder: ((context, index) {
+                    var quantity = orders![index]["quantity"];
+                    int price = orders![index]["price"];
+                    total += price;
                     return Padding(
                       padding: EdgeInsets.all(8.0),
                       child: ListTile(
