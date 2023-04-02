@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -20,6 +21,7 @@ class OrderPage extends StatefulWidget {
 
 class _OrderPageState extends State<OrderPage> {
   int total = 0;
+  int totalPrice = 0;
 
   Future<void> _dialogBuilder(BuildContext context, int total) {
     return showDialog<void>(
@@ -27,8 +29,9 @@ class _OrderPageState extends State<OrderPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Payment'),
-          content: Text('Your total amount is ${total.toString()}\n'
-              'Are you sure to do payment?'),
+          content:
+              Text('Your total amount is ${totalPrice.toString()}\n'
+                  'Are you sure to do payment?'),
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(
@@ -54,7 +57,8 @@ class _OrderPageState extends State<OrderPage> {
                     await Postdata(Uri.http('localhost:5000', 'payment'), data);
                 if (response['success'] == true) {
                   Fluttertoast.showToast(
-                      msg: 'Payment Done of Rs. ${total.toString()}');
+                      msg:
+                          'Payment Done of Rs. ${totalPrice.toString()}');
                   Navigator.popAndPushNamed(context, HomePage.routeName);
                 } else {
                   Fluttertoast.showToast(msg: 'Payment Failed!');
@@ -81,6 +85,9 @@ class _OrderPageState extends State<OrderPage> {
     await Getdata(Uri.http('localhost:5000', 'order')).then((value) {
       setState(() {
         orders = value;
+        for (var order in orders!) {
+          totalPrice += int.parse(order['price'].toString());
+        }
       });
     }).onError((error, stackTrace) {
       setState(() {
@@ -105,72 +112,103 @@ class _OrderPageState extends State<OrderPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        backgroundColor: Colors.orange,
-      ),
-      body: Center(
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 10.0),
-          color: Colors.black12,
-          width: 500.0,
-          child: Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListView.builder(
-                  itemCount: orders!.length,
-                  itemBuilder: ((context, index) {
-                    var quantity = orders![index]["quantity"];
-                    int price = orders![index]["price"];
-                    total += price;
-                    return Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: ListTile(
-                        title: Text(orders![index]['name']),
-                        trailing: Text(
-                          'Rs. ${orders![index]["price"].toString()} (${orders![index]["quantity"]})',
+    return WillPopScope(
+      onWillPop: () async {
+        Fluttertoast.showToast(msg: '');
+        Navigator.of(context).pop();
+        return await Getdata(Uri.http('localhost:5000', 'order'));
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+          backgroundColor: Colors.orange,
+        ),
+        body: Center(
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 10.0),
+            color: Colors.black12,
+            width: 500.0,
+            child: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListView.builder(
+                    itemCount: orders!.length,
+                    itemBuilder: ((context, index) {
+                      var quantity = orders![index]["quantity"];
+                      int price = orders![index]["price"];
+                      total += price;
+                      return Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: ListTile(
+                          title: Text(orders![index]['name']),
+                          trailing: Text(
+                            'Rs. ${orders![index]["price"].toString()} (${orders![index]["quantity"]})',
+                          ),
+                          leading: Image.network(
+                            orders![index]["image_url"],
+                            fit: BoxFit.cover,
+                            height: 50.0,
+                            width: 70.0,
+                          ),
                         ),
-                        leading: Image.network(
-                          orders![index]["image_url"],
-                          fit: BoxFit.cover,
-                          height: 50.0,
-                          width: 70.0,
+                      );
+                    }),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 12.0),
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: GestureDetector(
+                      onTap: () => _dialogBuilder(context, total),
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 10.0),
+                        decoration: BoxDecoration(
+                            color: Colors.blueGrey,
+                            borderRadius: BorderRadius.circular(8.0)),
+                        width: 200.0,
+                        height: 50.0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: const [
+                            Icon(
+                              Icons.payment,
+                              color: Colors.white,
+                            ),
+                            Text(
+                              "Proceed to Pay",
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: 18.0),
+                            ),
+                          ],
                         ),
                       ),
-                    );
-                  }),
-                ),
-              ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: GestureDetector(
-                  onTap: () => _dialogBuilder(context, total),
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 10.0),
-                    decoration: BoxDecoration(
-                        color: Colors.blueGrey,
-                        borderRadius: BorderRadius.circular(8.0)),
-                    width: 250.0,
-                    height: 50.0,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: const [
-                        Icon(
-                          Icons.payment,
-                          color: Colors.white,
-                        ),
-                        Text(
-                          "Proceed to Pay",
-                          style: TextStyle(color: Colors.white, fontSize: 18.0),
-                        ),
-                      ],
                     ),
                   ),
                 ),
-              ),
-            ],
+                Padding(
+                  padding: const EdgeInsets.only(left: 12.0),
+                  child: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 10.0),
+                      decoration: BoxDecoration(
+                          color: Colors.blueGrey,
+                          borderRadius: BorderRadius.circular(8.0)),
+                      width: 250.0,
+                      height: 50.0,
+                      child: Center(
+                        child: Text(
+                          "Total Amount: Rs. ${totalPrice.toString()}",
+                          style: TextStyle(color: Colors.white, fontSize: 18.0),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
